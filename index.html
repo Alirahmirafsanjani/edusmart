@@ -22,6 +22,11 @@
                         sd: '#EF4444', // Red for SD
                         smp: '#2563EB', // Blue for SMP
                         sma: '#6B7280', // Gray for SMA
+                        correct: '#10B981', // Green for correct answer
+                        wrong: '#EF4444', // Red for wrong answer
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 3s infinite',
                     }
                 }
             }
@@ -38,6 +43,10 @@
         /* Animasi Transisi */
         .fade-in { animation: fadeIn 0.5s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Quiz Styles */
+        .option-btn.correct { background-color: #D1FAE5; border-color: #10B981; color: #065F46; }
+        .option-btn.wrong { background-color: #FEE2E2; border-color: #EF4444; color: #991B1B; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans">
@@ -83,15 +92,7 @@
         
         <!-- Header per Jenjang -->
         <div id="level-header" class="mb-8 fade-in">
-            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white relative overflow-hidden">
-                <div class="relative z-10">
-                    <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-bold mb-2 inline-block">Mode Siswa SMP</span>
-                    <h1 class="text-3xl font-bold font-display mb-2">Ruang Belajar Interaktif</h1>
-                    <p class="opacity-90 max-w-xl">Akses materi, kerjakan kuis, dan tanyakan hal yang sulit dimengerti kepada guru melalui forum diskusi.</p>
-                </div>
-                <!-- Background Pattern -->
-                <i class="fas fa-book-open absolute right-4 bottom-[-20px] text-9xl opacity-10 rotate-12"></i>
-            </div>
+            <!-- Content injected by JS -->
         </div>
 
         <!-- Navigation Tabs (Materi vs Diskusi vs Kuis) -->
@@ -247,28 +248,84 @@
             </div>
         </div>
 
-        <!-- SECTION 3: KUIS -->
+        <!-- SECTION 3: KUIS (DIPERBARUI) -->
         <div id="tab-kuis" class="tab-content hidden fade-in">
-            <div class="bg-white rounded-2xl p-8 border border-gray-200 text-center shadow-sm">
+            <!-- 3.1: Menu Kuis (Pilih Mata Pelajaran) -->
+            <div id="quiz-menu" class="bg-white rounded-2xl p-8 border border-gray-200 text-center shadow-sm">
                 <div class="w-20 h-20 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
                     <i class="fas fa-trophy"></i>
                 </div>
-                <h3 class="text-2xl font-bold mb-2">Kuis Harian SMP</h3>
-                <p class="text-gray-500 mb-6">Kumpulkan poin dengan menjawab soal-soal latihan.</p>
+                <h3 id="quiz-title-display" class="text-2xl font-bold mb-2">Kuis Harian SMP</h3>
+                <p class="text-gray-500 mb-6">Pilih mata pelajaran untuk mulai mengerjakan.</p>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
-                    <button class="p-4 border border-gray-200 rounded-xl hover:border-primary hover:bg-blue-50 transition text-left group">
-                        <span class="block font-bold text-gray-800 group-hover:text-primary">Matematika Dasar</span>
-                        <span class="text-xs text-gray-400">10 Soal • 500 Poin</span>
+                    <button onclick="startQuiz('Matematika')" class="p-4 border border-gray-200 rounded-xl hover:border-primary hover:bg-blue-50 transition text-left group">
+                        <span class="block font-bold text-gray-800 group-hover:text-primary">Matematika</span>
+                        <span class="text-xs text-gray-400">Tersedia 3 Soal</span>
                     </button>
-                    <button class="p-4 border border-gray-200 rounded-xl hover:border-primary hover:bg-blue-50 transition text-left group">
+                    <button onclick="startQuiz('IPA')" class="p-4 border border-gray-200 rounded-xl hover:border-primary hover:bg-blue-50 transition text-left group">
+                        <span class="block font-bold text-gray-800 group-hover:text-primary">IPA (Sains)</span>
+                        <span class="text-xs text-gray-400">Tersedia 3 Soal</span>
+                    </button>
+                    <button onclick="startQuiz('Umum')" class="p-4 border border-gray-200 rounded-xl hover:border-primary hover:bg-blue-50 transition text-left group">
                         <span class="block font-bold text-gray-800 group-hover:text-primary">Pengetahuan Umum</span>
-                        <span class="text-xs text-gray-400">15 Soal • 750 Poin</span>
-                    </button>
-                    <button class="p-4 border border-gray-200 rounded-xl hover:border-primary hover:bg-blue-50 transition text-left group">
-                        <span class="block font-bold text-gray-800 group-hover:text-primary">Bahasa Inggris</span>
-                        <span class="text-xs text-gray-400">10 Soal • 500 Poin</span>
+                        <span class="text-xs text-gray-400">Tersedia 3 Soal</span>
                     </button>
                 </div>
+            </div>
+
+            <!-- 3.2: Interface Kuis (Soal Aktif) -->
+            <div id="quiz-interface" class="hidden max-w-2xl mx-auto">
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+                    <!-- Header Kuis -->
+                    <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                        <div>
+                            <span id="active-subject" class="text-xs font-bold uppercase tracking-wider text-primary">MATEMATIKA</span>
+                            <h4 class="font-bold text-gray-800">Pertanyaan <span id="q-current">1</span> dari <span id="q-total">10</span></h4>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-gray-500 block">Skor Sementara</span>
+                            <span id="current-score" class="font-bold text-primary text-lg">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Body Soal -->
+                    <div class="p-6 md:p-8">
+                        <p id="question-text" class="text-lg md:text-xl font-medium text-gray-800 mb-8 leading-relaxed">
+                            Loading question...
+                        </p>
+                        
+                        <div id="options-container" class="space-y-3">
+                            <!-- Options injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Footer Kuis -->
+                    <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 flex justify-between items-center">
+                        <button onclick="resetQuiz()" class="text-gray-500 hover:text-red-500 text-sm font-medium px-4 py-2">
+                            Keluar
+                        </button>
+                        <button id="btn-next" onclick="nextQuestion()" class="bg-primary text-white px-6 py-2 rounded-lg font-bold shadow-md hover:bg-blue-700 transition disabled:opacity-50 hidden">
+                            Lanjut <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3.3: Hasil Kuis -->
+            <div id="quiz-result" class="hidden bg-white rounded-2xl p-8 border border-gray-200 text-center shadow-sm max-w-lg mx-auto">
+                <i class="fas fa-star text-6xl text-yellow-400 mb-4 animate-bounce"></i>
+                <h3 class="text-2xl font-bold mb-2">Kuis Selesai!</h3>
+                <p class="text-gray-500 mb-6">Kamu telah menyelesaikan kuis <span id="result-subject" class="font-bold text-gray-800">Matematika</span>.</p>
+                
+                <div class="bg-gray-50 rounded-xl p-6 mb-6">
+                    <span class="block text-sm text-gray-500 uppercase tracking-wide">Skor Akhir</span>
+                    <span id="final-score-display" class="block text-5xl font-bold text-primary my-2">80</span>
+                    <span id="final-feedback" class="text-sm font-medium text-green-600">Luar Biasa! 🎉</span>
+                </div>
+
+                <button onclick="resetQuiz()" class="bg-primary text-white w-full py-3 rounded-xl font-bold hover:bg-blue-700 transition">
+                    Kembali ke Menu Kuis
+                </button>
             </div>
         </div>
     </main>
@@ -306,44 +363,104 @@
     </div>
 
     <script>
-        // Data Dummy untuk simulasi perubahan konten
+        // --- 1. CONFIGURATION & DATA ---
+        
+        // Data Tampilan per Jenjang
         const contentData = {
             'SD': {
                 color: 'red',
                 title: 'Dunia Belajar Ceria SD',
                 desc: 'Belajar sambil bermain dengan video animasi lucu dan kuis warna-warni.',
-                materi: 'Matematika Dasar, Membaca, Mengenal Hewan',
                 quizTitle: 'Kuis Petualangan SD'
             },
             'SMP': {
                 color: 'blue',
                 title: 'Ruang Belajar Interaktif SMP',
                 desc: 'Akses materi, kerjakan kuis, dan tanyakan hal yang sulit dimengerti kepada guru melalui forum diskusi.',
-                materi: 'Aljabar, Fisika Dasar, Biologi Sel',
                 quizTitle: 'Kuis Harian SMP'
             },
             'SMA': {
                 color: 'gray',
                 title: 'Persiapan Ujian & Materi SMA',
                 desc: 'Diskusi mendalam untuk persiapan UTBK, materi kompleks, dan bimbingan karir.',
-                materi: 'Kalkulus, Kimia Organik, Sosiologi',
                 quizTitle: 'Tryout & Latihan Soal SMA'
             }
         };
 
-        let currentLevel = 'SMP'; // Default
+        // DATABASE SOAL KUIS (EDIT BAGIAN INI UNTUK MEMASUKKAN PERTANYAAN BARU)
+        const quizDatabase = {
+            'SD': {
+                'Matematika': [
+                    { q: "5 + 5 = ...", options: ["10", "15", "8", "9"], correct: 0 },
+                    { q: "Bangun datar yang memiliki 3 sisi disebut...", options: ["Persegi", "Segitiga", "Lingkaran", "Kotak"], correct: 1 },
+                    { q: "10 - 4 = ...", options: ["5", "6", "7", "4"], correct: 1 }
+                ],
+                'IPA': [
+                    { q: "Hewan pemakan daging disebut...", options: ["Herbivora", "Karnivora", "Omnivora", "Insektivora"], correct: 1 },
+                    { q: "Matahari terbit dari sebelah...", options: ["Barat", "Selatan", "Timur", "Utara"], correct: 2 },
+                    { q: "Kucing berkembang biak dengan cara...", options: ["Bertelur", "Melahirkan", "Membelah diri", "Bertunas"], correct: 1 }
+                ],
+                'Umum': [
+                    { q: "Ibukota Indonesia adalah...", options: ["Bandung", "Jakarta", "Surabaya", "Medan"], correct: 1 },
+                    { q: "Warna bendera Indonesia adalah...", options: ["Merah Putih", "Putih Merah", "Merah Biru", "Kuning Hijau"], correct: 0 },
+                    { q: "Presiden pertama Indonesia adalah...", options: ["Soeharto", "Soekarno", "Habibie", "Jokowi"], correct: 1 }
+                ]
+            },
+            'SMP': {
+                'Matematika': [
+                    { q: "Hasil dari -5 + 12 adalah...", options: ["-7", "7", "17", "-17"], correct: 1 },
+                    { q: "Rumus luas lingkaran adalah...", options: ["2 x π x r", "π x r x r", "p x l", "s x s"], correct: 1 },
+                    { q: "Sudut siku-siku besarnya... derajat", options: ["45", "90", "180", "360"], correct: 1 }
+                ],
+                'IPA': [
+                    { q: "Bagian terkecil dari makhluk hidup disebut...", options: ["Jaringan", "Organ", "Sel", "Sistem Organ"], correct: 2 },
+                    { q: "Satuan kuat arus listrik adalah...", options: ["Volt", "Ampere", "Watt", "Ohm"], correct: 1 },
+                    { q: "Peristiwa perubahan wujud dari cair ke gas disebut...", options: ["Mencair", "Membeku", "Menguap", "Menyublim"], correct: 2 }
+                ],
+                'Umum': [
+                    { q: "Negara yang dijuluki Negeri Sakura adalah...", options: ["Korea", "Cina", "Jepang", "Thailand"], correct: 2 },
+                    { q: "Candi Borobudur terletak di provinsi...", options: ["Jawa Timur", "Jawa Tengah", "Yogyakarta", "Jawa Barat"], correct: 1 },
+                    { q: "Tanggal 17 Agustus diperingati sebagai hari...", options: ["Pahlawan", "Kemerdekaan", "Pendidikan", "Kartini"], correct: 1 }
+                ]
+            },
+            'SMA': {
+                'Matematika': [
+                    { q: "Turunan dari 2x^2 adalah...", options: ["2x", "4x", "x", "4"], correct: 1 },
+                    { q: "Nilai sin 30 derajat adalah...", options: ["1/2", "1/3", "0", "1"], correct: 0 },
+                    { q: "Log 100 dengan basis 10 adalah...", options: ["1", "2", "10", "100"], correct: 1 }
+                ],
+                'IPA': [
+                    { q: "Hukum Newton I dikenal juga sebagai hukum...", options: ["Aksi-Reaksi", "Kelembaman", "Percepatan", "Gravitasi"], correct: 1 },
+                    { q: "Senyawa kimia air adalah...", options: ["CO2", "H2O", "O2", "NaCl"], correct: 1 },
+                    { q: "Organel sel yang berfungsi menghasilkan energi adalah...", options: ["Ribosom", "Lisosom", "Mitokondria", "Nukleus"], correct: 2 }
+                ],
+                'Umum': [
+                    { q: "Organisasi PBB didirikan pada tahun...", options: ["1944", "1945", "1946", "1950"], correct: 1 },
+                    { q: "Mata uang negara Inggris adalah...", options: ["Dollar", "Euro", "Poundsterling", "Yen"], correct: 2 },
+                    { q: "Penulis novel 'Laskar Pelangi' adalah...", options: ["Andrea Hirata", "Tere Liye", "Raditya Dika", "Habiburrahman"], correct: 0 }
+                ]
+            }
+        };
+
+        // --- 2. STATE MANAGEMENT ---
+        let currentLevel = 'SMP'; 
+        let currentQuizQuestions = [];
+        let currentQuestionIndex = 0;
+        let userScore = 0;
+        let currentSubject = '';
+
+        // --- 3. CORE FUNCTIONS ---
 
         function switchLevel(level) {
             currentLevel = level;
             const data = contentData[level];
             const header = document.getElementById('level-header');
 
-            // Reset Button Styles
+            // Update UI Button Styles
             document.querySelectorAll('.level-btn').forEach(btn => {
                 btn.className = `level-btn px-6 py-2 rounded-full border-2 border-gray-100 bg-gray-50 text-gray-600 font-bold hover:bg-gray-200 transition flex items-center gap-2`;
             });
 
-            // Set Active Button Style
             const activeBtn = document.getElementById(`btn-${level.toLowerCase()}`);
             let colorClass = level === 'SD' ? 'bg-red-600 border-red-500 shadow-red-200' : 
                              level === 'SMP' ? 'bg-blue-600 border-blue-500 shadow-blue-200' : 
@@ -351,7 +468,7 @@
             
             activeBtn.className = `level-btn px-6 py-2 rounded-full border-2 text-white font-bold shadow-lg transition flex items-center gap-2 ${colorClass}`;
 
-            // Update Header Content with Animation
+            // Update Header
             header.innerHTML = `
                 <div class="bg-gradient-to-r from-${data.color}-600 to-${data.color}-500 rounded-2xl p-8 text-white relative overflow-hidden">
                     <div class="relative z-10">
@@ -363,30 +480,139 @@
                 </div>
             `;
             
-            // Re-trigger animation
+            // Animation reset
             header.classList.remove('fade-in');
-            void header.offsetWidth; // trigger reflow
+            void header.offsetWidth;
             header.classList.add('fade-in');
 
-            // Update Quiz Title
-            document.querySelector('#tab-kuis h3').innerText = data.quizTitle;
+            // Reset Tab Views if needed
+            document.getElementById('quiz-title-display').innerText = data.quizTitle;
+            resetQuiz(); // Reset quiz if level changes
         }
 
         function switchTab(tabName) {
-            // Hide all contents
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            
-            // Show selected content
             document.getElementById(`tab-${tabName}`).classList.remove('hidden');
 
-            // Update tab styles
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.className = 'tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium pb-3 px-2 whitespace-nowrap relative';
             });
             
-            // Set active tab style
-            const activeTabBtn = event.currentTarget; // Get the clicked button
-            activeTabBtn.className = 'tab-btn active border-b-2 border-primary text-primary font-bold pb-3 px-2 whitespace-nowrap relative';
+            event.currentTarget.className = 'tab-btn active border-b-2 border-primary text-primary font-bold pb-3 px-2 whitespace-nowrap relative';
+        }
+
+        // --- 4. QUIZ LOGIC ENGINE ---
+
+        function startQuiz(subject) {
+            // Setup Data
+            currentSubject = subject;
+            // Get questions based on Level AND Subject. Fallback to empty array if not found.
+            if(quizDatabase[currentLevel] && quizDatabase[currentLevel][subject]) {
+                currentQuizQuestions = quizDatabase[currentLevel][subject];
+            } else {
+                alert("Maaf, soal untuk mata pelajaran ini belum tersedia.");
+                return;
+            }
+            
+            currentQuestionIndex = 0;
+            userScore = 0;
+
+            // Update UI
+            document.getElementById('quiz-menu').classList.add('hidden');
+            document.getElementById('quiz-interface').classList.remove('hidden');
+            document.getElementById('quiz-result').classList.add('hidden');
+
+            document.getElementById('active-subject').innerText = subject;
+            document.getElementById('q-total').innerText = currentQuizQuestions.length;
+            document.getElementById('current-score').innerText = '0';
+
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = currentQuizQuestions[currentQuestionIndex];
+            document.getElementById('q-current').innerText = currentQuestionIndex + 1;
+            document.getElementById('question-text').innerText = q.q;
+            document.getElementById('btn-next').classList.add('hidden');
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = ''; // Clear previous options
+
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full text-left p-4 rounded-xl border-2 border-gray-200 hover:border-primary hover:bg-blue-50 transition font-medium text-gray-700 flex justify-between items-center group';
+                btn.innerHTML = `<span>${opt}</span> <i class="far fa-circle text-gray-400 group-hover:text-primary"></i>`;
+                btn.onclick = () => checkAnswer(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIndex, btnElement) {
+            // Prevent multiple clicks
+            const allButtons = document.querySelectorAll('.option-btn');
+            allButtons.forEach(btn => btn.disabled = true);
+
+            const correctIndex = currentQuizQuestions[currentQuestionIndex].correct;
+
+            if (selectedIndex === correctIndex) {
+                // Correct Logic
+                btnElement.classList.remove('border-gray-200', 'hover:border-primary', 'hover:bg-blue-50');
+                btnElement.classList.add('correct');
+                btnElement.querySelector('i').className = 'fas fa-check-circle text-green-600';
+                userScore += 100; // Example scoring
+            } else {
+                // Wrong Logic
+                btnElement.classList.remove('border-gray-200', 'hover:border-primary', 'hover:bg-blue-50');
+                btnElement.classList.add('wrong');
+                btnElement.querySelector('i').className = 'fas fa-times-circle text-red-600';
+                
+                // Highlight Correct One
+                const correctBtn = allButtons[correctIndex];
+                correctBtn.classList.remove('border-gray-200');
+                correctBtn.classList.add('correct');
+                correctBtn.querySelector('i').className = 'fas fa-check-circle text-green-600';
+            }
+
+            // Update Score Display
+            document.getElementById('current-score').innerText = userScore;
+
+            // Show Next Button
+            document.getElementById('btn-next').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuizQuestions.length) {
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('quiz-interface').classList.add('hidden');
+            document.getElementById('quiz-result').classList.remove('hidden');
+            
+            document.getElementById('result-subject').innerText = currentSubject;
+            document.getElementById('final-score-display').innerText = userScore;
+            
+            // Calculate percentage for feedback
+            const maxScore = currentQuizQuestions.length * 100;
+            const percentage = (userScore / maxScore) * 100;
+            
+            let feedback = "";
+            if (percentage === 100) feedback = "Sempurna! Kamu hebat sekali! 🌟";
+            else if (percentage >= 70) feedback = "Bagus sekali! Pertahankan! 👍";
+            else if (percentage >= 40) feedback = "Cukup bagus, tapi perlu belajar lagi. 💪";
+            else feedback = "Jangan menyerah, ayo coba lagi! 🔥";
+            
+            document.getElementById('final-feedback').innerText = feedback;
+        }
+
+        function resetQuiz() {
+            document.getElementById('quiz-interface').classList.add('hidden');
+            document.getElementById('quiz-result').classList.add('hidden');
+            document.getElementById('quiz-menu').classList.remove('hidden');
         }
 
         // Initialize default state
