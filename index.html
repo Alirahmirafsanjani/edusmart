@@ -3,443 +3,394 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduSmart - Belajar Jadi Seru!</title>
-    <!-- Tailwind CSS -->
+    <title>EduSmart - Platform Edukasi Terpadu</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Nunito', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
                         display: ['Fredoka', 'sans-serif'],
                     },
                     colors: {
-                        primary: '#4F46E5', // Indigo
-                        secondary: '#F59E0B', // Amber
-                        accent: '#10B981', // Emerald
-                        bgSoft: '#EEF2FF',
-                    },
-                    animation: {
-                        'float': 'float 6s ease-in-out infinite',
-                        'bounce-slow': 'bounce 3s infinite',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0)' },
-                            '50%': { transform: 'translateY(-20px)' },
-                        }
+                        primary: '#2563EB', // Blue 600
+                        secondary: '#F59E0B', // Amber 500
+                        sd: '#EF4444', // Red for SD
+                        smp: '#2563EB', // Blue for SMP
+                        sma: '#6B7280', // Gray for SMA
                     }
                 }
             }
         }
     </script>
     <style>
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #4F46E5;
-            border-radius: 5px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #4338ca;
-        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .chat-bubble { position: relative; max-width: 80%; }
+        .chat-bubble::after { content: ''; position: absolute; bottom: 0; width: 0; height: 0; border: 10px solid transparent; }
+        .chat-left::after { left: -10px; border-right-color: #F3F4F6; border-bottom: 0; }
+        .chat-right::after { right: -10px; border-left-color: #DBEAFE; border-bottom: 0; }
         
-        .blob {
-            position: absolute;
-            filter: blur(40px);
-            z-index: -1;
-            opacity: 0.4;
-        }
+        /* Animasi Transisi */
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="font-sans text-gray-700 bg-bgSoft selection:bg-secondary selection:text-white">
+<body class="bg-gray-50 text-gray-800 font-sans">
 
     <!-- Navbar -->
-    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                <!-- Logo -->
-                <div class="flex items-center gap-2 cursor-pointer" onclick="window.scrollTo(0,0)">
-                    <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white text-2xl rotate-3 shadow-lg">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-                    <span class="font-display font-bold text-2xl text-primary">Edu<span class="text-secondary">Smart</span></span>
+    <nav class="bg-white sticky top-0 z-50 border-b border-gray-200 shadow-sm">
+        <div class="container mx-auto px-4 h-16 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white">
+                    <i class="fas fa-graduation-cap"></i>
                 </div>
-
-                <!-- Desktop Menu -->
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="#beranda" class="font-medium hover:text-primary transition">Beranda</a>
-                    <a href="#materi" class="font-medium hover:text-primary transition">Materi</a>
-                    <a href="#fitur" class="font-medium hover:text-primary transition">Fitur</a>
-                    <a href="#kuis" class="font-medium hover:text-primary transition">Kuis Seru</a>
-                    <button class="bg-primary hover:bg-indigo-700 text-white px-6 py-2.5 rounded-full font-bold shadow-md hover:shadow-lg transition transform hover:-translate-y-0.5">
-                        Masuk
-                    </button>
-                </div>
-
-                <!-- Mobile Menu Button -->
-                <div class="md:hidden">
-                    <button onclick="toggleMenu()" class="text-gray-600 hover:text-primary focus:outline-none">
-                        <i class="fas fa-bars text-2xl"></i>
-                    </button>
+                <span class="font-display font-bold text-xl text-primary">EduSmart</span>
+            </div>
+            <div class="flex gap-4 items-center">
+                <span class="hidden md:inline text-sm text-gray-500">Halo, Siswa</span>
+                <div class="w-8 h-8 rounded-full bg-gray-200 overflow-hidden border border-gray-300">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="User">
                 </div>
             </div>
-        </div>
-        
-        <!-- Mobile Menu Dropdown -->
-        <div id="mobileMenu" class="hidden md:hidden bg-white border-t p-4 space-y-3 shadow-lg">
-            <a href="#beranda" class="block py-2 px-4 rounded-lg hover:bg-indigo-50 text-gray-700">Beranda</a>
-            <a href="#materi" class="block py-2 px-4 rounded-lg hover:bg-indigo-50 text-gray-700">Materi</a>
-            <a href="#kuis" class="block py-2 px-4 rounded-lg hover:bg-indigo-50 text-gray-700">Kuis Seru</a>
-            <button class="w-full bg-primary text-white py-2 rounded-lg font-bold mt-2">Masuk</button>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="beranda" class="relative pt-20 pb-32 overflow-hidden">
-        <div class="blob bg-purple-300 w-96 h-96 rounded-full top-0 left-0 -translate-x-1/2 -translate-y-1/2"></div>
-        <div class="blob bg-yellow-200 w-80 h-80 rounded-full bottom-0 right-0 translate-x-1/3 translate-y-1/3"></div>
-
-        <div class="container mx-auto px-4 flex flex-col-reverse md:flex-row items-center gap-12">
-            <div class="md:w-1/2 space-y-6 text-center md:text-left z-10">
-                <div class="inline-block px-4 py-1.5 bg-indigo-100 text-primary rounded-full text-sm font-bold mb-2">
-                    🚀 Platform Belajar #1 di Indonesia
-                </div>
-                <h1 class="font-display text-4xl md:text-6xl font-bold leading-tight text-gray-900">
-                    Belajar Jadi Lebih <br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600">Mudah & Asik!</span>
-                </h1>
-                <p class="text-lg text-gray-600 leading-relaxed">
-                    Temukan ribuan materi pelajaran, video interaktif, dan kuis seru yang bikin kamu makin pinter tanpa rasa bosan. Gabung bersama EduSmart sekarang!
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                    <button onclick="scrollToSection('materi')" class="bg-primary hover:bg-indigo-700 text-white px-8 py-3.5 rounded-full font-bold shadow-lg hover:shadow-primary/50 transition transform hover:-translate-y-1 flex items-center justify-center gap-2">
-                        <span>Mulai Belajar</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
-                    <button class="bg-white hover:bg-gray-50 text-gray-800 border-2 border-gray-200 px-8 py-3.5 rounded-full font-bold transition flex items-center justify-center gap-2">
-                        <i class="fas fa-play-circle text-secondary text-xl"></i>
-                        <span>Tonton Demo</span>
-                    </button>
-                </div>
-                
-                <div class="pt-6 flex items-center justify-center md:justify-start gap-6 text-gray-500 text-sm font-medium">
-                    <div class="flex items-center gap-2">
-                        <i class="fas fa-check-circle text-accent"></i> Gratis Akses
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <i class="fas fa-check-circle text-accent"></i> Materi Update
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <i class="fas fa-check-circle text-accent"></i> Mentor Ahli
-                    </div>
-                </div>
-            </div>
-            
-            <div class="md:w-1/2 relative z-10 animate-float">
-                <!-- Simple SVG Illustration for Education -->
-                <div class="bg-white p-6 rounded-3xl shadow-2xl border-4 border-white transform rotate-2">
-                    <div class="bg-indigo-50 rounded-2xl overflow-hidden aspect-video flex items-center justify-center relative">
-                        <div class="absolute inset-0 bg-grid-pattern opacity-10"></div>
-                        <i class="fas fa-rocket text-9xl text-primary/20 absolute"></i>
-                        <div class="text-center z-10">
-                            <i class="fas fa-laptop-code text-6xl text-primary mb-4 block"></i>
-                            <span class="font-display font-bold text-xl text-gray-800">Kelas Online Interaktif</span>
-                        </div>
-                        
-                        <!-- Floating Elements -->
-                        <div class="absolute top-4 right-4 bg-white p-2 rounded-lg shadow-md animate-bounce-slow">
-                            <i class="fas fa-star text-secondary text-xl"></i>
-                        </div>
-                        <div class="absolute bottom-4 left-4 bg-white p-2 rounded-lg shadow-md animate-bounce-slow" style="animation-delay: 1s;">
-                            <i class="fas fa-lightbulb text-yellow-400 text-xl"></i>
-                        </div>
-                    </div>
-                    <div class="mt-4 flex items-center justify-between">
-                        <div class="flex -space-x-2">
-                            <div class="w-8 h-8 rounded-full bg-blue-400 border-2 border-white"></div>
-                            <div class="w-8 h-8 rounded-full bg-red-400 border-2 border-white"></div>
-                            <div class="w-8 h-8 rounded-full bg-green-400 border-2 border-white"></div>
-                            <div class="w-8 h-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs font-bold text-gray-500">+1k</div>
-                        </div>
-                        <div class="text-sm font-bold text-primary">Siswa Aktif</div>
-                    </div>
-                </div>
+    <!-- Level Selector (Pemisah Jenjang) -->
+    <section class="bg-white py-6 border-b border-gray-200">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-lg font-bold mb-4 text-gray-700">Pilih Jenjang Pendidikan Kamu</h2>
+            <div class="flex justify-center gap-2 md:gap-4">
+                <button onclick="switchLevel('SD')" id="btn-sd" class="level-btn px-6 py-2 rounded-full border-2 border-red-100 bg-red-50 text-red-600 font-bold hover:bg-red-100 transition flex items-center gap-2">
+                    <i class="fas fa-shapes"></i> SD
+                </button>
+                <button onclick="switchLevel('SMP')" id="btn-smp" class="level-btn px-6 py-2 rounded-full border-2 border-blue-500 bg-blue-600 text-white font-bold shadow-lg shadow-blue-200 transition flex items-center gap-2">
+                    <i class="fas fa-book-reader"></i> SMP
+                </button>
+                <button onclick="switchLevel('SMA')" id="btn-sma" class="level-btn px-6 py-2 rounded-full border-2 border-gray-100 bg-gray-50 text-gray-600 font-bold hover:bg-gray-200 transition flex items-center gap-2">
+                    <i class="fas fa-atom"></i> SMA
+                </button>
             </div>
         </div>
     </section>
 
-    <!-- Kategori Materi Section -->
-    <section id="materi" class="py-20 bg-white">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-16">
-                <span class="text-secondary font-bold tracking-wider uppercase text-sm">Pelajaran Favorit</span>
-                <h2 class="font-display text-3xl md:text-4xl font-bold text-gray-900 mt-2">Pilih Materi Belajarmu</h2>
-                <div class="w-24 h-1.5 bg-primary mx-auto mt-4 rounded-full"></div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                <!-- Card 1 -->
-                <div class="group bg-white border border-gray-100 rounded-2xl p-6 shadow-lg hover:shadow-2xl hover:shadow-blue-200 transition-all duration-300 hover:-translate-y-2 cursor-pointer">
-                    <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 text-3xl mb-4 group-hover:scale-110 transition">
-                        <i class="fas fa-square-root-alt"></i>
-                    </div>
-                    <h3 class="font-display text-xl font-bold text-gray-800 mb-2">Matematika</h3>
-                    <p class="text-gray-500 text-sm mb-4">Belajar hitung-hitungan, aljabar, dan geometri dengan cara visual.</p>
-                    <span class="text-blue-600 font-bold text-sm group-hover:underline">Mulai Belajar &rarr;</span>
-                </div>
-
-                <!-- Card 2 -->
-                <div class="group bg-white border border-gray-100 rounded-2xl p-6 shadow-lg hover:shadow-2xl hover:shadow-green-200 transition-all duration-300 hover:-translate-y-2 cursor-pointer">
-                    <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center text-green-600 text-3xl mb-4 group-hover:scale-110 transition">
-                        <i class="fas fa-flask"></i>
-                    </div>
-                    <h3 class="font-display text-xl font-bold text-gray-800 mb-2">Sains (IPA)</h3>
-                    <p class="text-gray-500 text-sm mb-4">Eksperimen seru biologi, fisika, dan kimia dari rumah.</p>
-                    <span class="text-green-600 font-bold text-sm group-hover:underline">Mulai Belajar &rarr;</span>
-                </div>
-
-                <!-- Card 3 -->
-                <div class="group bg-white border border-gray-100 rounded-2xl p-6 shadow-lg hover:shadow-2xl hover:shadow-red-200 transition-all duration-300 hover:-translate-y-2 cursor-pointer">
-                    <div class="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center text-red-600 text-3xl mb-4 group-hover:scale-110 transition">
-                        <i class="fas fa-language"></i>
-                    </div>
-                    <h3 class="font-display text-xl font-bold text-gray-800 mb-2">Bahasa Inggris</h3>
-                    <p class="text-gray-500 text-sm mb-4">Tingkatkan vocabulary dan grammar dengan percakapan sehari-hari.</p>
-                    <span class="text-red-600 font-bold text-sm group-hover:underline">Mulai Belajar &rarr;</span>
-                </div>
-
-                <!-- Card 4 -->
-                <div class="group bg-white border border-gray-100 rounded-2xl p-6 shadow-lg hover:shadow-2xl hover:shadow-purple-200 transition-all duration-300 hover:-translate-y-2 cursor-pointer">
-                    <div class="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600 text-3xl mb-4 group-hover:scale-110 transition">
-                        <i class="fas fa-palette"></i>
-                    </div>
-                    <h3 class="font-display text-xl font-bold text-gray-800 mb-2">Seni & Budaya</h3>
-                    <p class="text-gray-500 text-sm mb-4">Kembangkan kreativitasmu melalui menggambar dan sejarah seni.</p>
-                    <span class="text-purple-600 font-bold text-sm group-hover:underline">Mulai Belajar &rarr;</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Quiz Section (Interactive) -->
-    <section id="kuis" class="py-20 relative bg-primary overflow-hidden">
-        <!-- Background Patterns -->
-        <i class="fas fa-question absolute top-10 left-10 text-white opacity-10 text-6xl animate-bounce-slow"></i>
-        <i class="fas fa-lightbulb absolute bottom-10 right-10 text-white opacity-10 text-6xl animate-bounce-slow" style="animation-delay: 1.5s;"></i>
+    <!-- Main Content Area -->
+    <main class="container mx-auto px-4 py-8">
         
-        <div class="container mx-auto px-4 relative z-10">
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div class="text-white space-y-6">
-                    <h2 class="font-display text-3xl md:text-5xl font-bold">Uji Pengetahuanmu!</h2>
-                    <p class="text-indigo-100 text-lg">Coba jawab kuis cepat ini untuk melihat seberapa jauh pengetahuan umum kamu. Setiap jawaban benar akan mendapatkan poin!</p>
-                    <div class="flex gap-4">
-                        <div class="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
-                            <h4 class="font-bold text-2xl">100+</h4>
-                            <p class="text-sm text-indigo-200">Kuis Harian</p>
+        <!-- Header per Jenjang -->
+        <div id="level-header" class="mb-8 fade-in">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white relative overflow-hidden">
+                <div class="relative z-10">
+                    <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-bold mb-2 inline-block">Mode Siswa SMP</span>
+                    <h1 class="text-3xl font-bold font-display mb-2">Ruang Belajar Interaktif</h1>
+                    <p class="opacity-90 max-w-xl">Akses materi, kerjakan kuis, dan tanyakan hal yang sulit dimengerti kepada guru melalui forum diskusi.</p>
+                </div>
+                <!-- Background Pattern -->
+                <i class="fas fa-book-open absolute right-4 bottom-[-20px] text-9xl opacity-10 rotate-12"></i>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs (Materi vs Diskusi vs Kuis) -->
+        <div class="flex border-b border-gray-200 mb-6 gap-6 overflow-x-auto hide-scrollbar">
+            <button onclick="switchTab('materi')" class="tab-btn active border-b-2 border-primary text-primary font-bold pb-3 px-2 whitespace-nowrap">
+                <i class="fas fa-book mr-2"></i>Materi Pelajaran
+            </button>
+            <button onclick="switchTab('diskusi')" class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium pb-3 px-2 whitespace-nowrap relative">
+                <i class="fas fa-comments mr-2"></i>Forum Diskusi
+                <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+            </button>
+            <button onclick="switchTab('kuis')" class="tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium pb-3 px-2 whitespace-nowrap">
+                <i class="fas fa-gamepad mr-2"></i>Kuis & Latihan
+            </button>
+        </div>
+
+        <!-- SECTION 1: MATERI -->
+        <div id="tab-materi" class="tab-content fade-in">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Card Materi -->
+                <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 rounded-lg bg-orange-100 flex items-center justify-center text-orange-600 text-xl">
+                            <i class="fas fa-calculator"></i>
                         </div>
-                        <div class="bg-white/10 p-4 rounded-xl backdrop-blur-sm">
-                            <h4 class="font-bold text-2xl">Top 10</h4>
-                            <p class="text-sm text-indigo-200">Leaderboard</p>
-                        </div>
+                        <span class="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded">Bab 1</span>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">Aljabar Linear</h3>
+                    <p class="text-gray-500 text-sm mb-4 line-clamp-2">Memahami konsep variabel, koefisien, dan konstanta dalam matematika.</p>
+                    <div class="flex items-center text-sm text-primary font-bold">
+                        Akses Materi <i class="fas fa-arrow-right ml-2"></i>
                     </div>
                 </div>
 
-                <!-- Interactive Quiz Card -->
-                <div class="bg-white rounded-3xl p-8 shadow-2xl">
-                    <div id="quiz-container">
-                        <div class="flex justify-between items-center mb-6">
-                            <span class="text-sm font-bold text-gray-400">Pertanyaan <span id="q-number">1</span>/3</span>
-                            <span class="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full">Sains Dasar</span>
+                <div class="bg-white p-5 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center text-green-600 text-xl">
+                            <i class="fas fa-leaf"></i>
                         </div>
-                        
-                        <h3 class="font-display text-xl font-bold text-gray-800 mb-6" id="q-text">Planet apa yang paling dekat dengan Matahari?</h3>
-                        
-                        <div class="space-y-3" id="options-container">
-                            <!-- Options will be injected here by JS -->
-                        </div>
-
-                        <div id="feedback" class="mt-4 hidden p-3 rounded-lg text-center font-bold text-sm"></div>
-                        
-                        <button id="next-btn" onclick="nextQuestion()" class="w-full bg-primary text-white py-3 rounded-xl font-bold mt-6 hover:bg-indigo-700 transition hidden">
-                            Soal Berikutnya
-                        </button>
+                        <span class="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded">Bab 3</span>
                     </div>
-
-                    <div id="quiz-result" class="hidden text-center py-8">
-                        <i class="fas fa-trophy text-6xl text-yellow-400 mb-4 animate-bounce"></i>
-                        <h3 class="font-display text-2xl font-bold text-gray-800">Hebat!</h3>
-                        <p class="text-gray-600 mt-2">Kamu mendapatkan skor: <span id="final-score" class="font-bold text-primary text-xl">0</span></p>
-                        <button onclick="restartQuiz()" class="mt-6 bg-secondary text-white px-6 py-2 rounded-full font-bold hover:bg-amber-600 transition">
-                            Main Lagi
-                        </button>
+                    <h3 class="font-bold text-lg mb-2">Sistem Ekskresi</h3>
+                    <p class="text-gray-500 text-sm mb-4 line-clamp-2">Belajar tentang organ-organ pembuangan pada tubuh manusia dan fungsinya.</p>
+                    <div class="flex items-center text-sm text-primary font-bold">
+                        Akses Materi <i class="fas fa-arrow-right ml-2"></i>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white pt-16 pb-8">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-                <div class="col-span-1 md:col-span-1">
-                    <div class="flex items-center gap-2 mb-4">
-                        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white text-lg">
-                            <i class="fas fa-graduation-cap"></i>
+        <!-- SECTION 2: FORUM DISKUSI (FITUR UTAMA) -->
+        <div id="tab-diskusi" class="tab-content hidden fade-in">
+            <div class="flex flex-col lg:flex-row gap-6">
+                
+                <!-- Sidebar Topik -->
+                <div class="w-full lg:w-1/4">
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                        <h3 class="font-bold text-gray-700 mb-4">Topik Diskusi</h3>
+                        <div class="space-y-2">
+                            <button class="w-full text-left px-3 py-2 rounded-lg bg-blue-50 text-blue-700 font-medium text-sm">Semua Mapel</button>
+                            <button class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-600 font-medium text-sm">Matematika</button>
+                            <button class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-600 font-medium text-sm">IPA / Fisika</button>
+                            <button class="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-600 font-medium text-sm">Bahasa Inggris</button>
                         </div>
-                        <span class="font-display font-bold text-xl">EduSmart</span>
+                        <button onclick="document.getElementById('question-modal').classList.remove('hidden')" class="w-full mt-4 bg-primary text-white py-2 rounded-lg font-bold text-sm shadow-lg shadow-blue-200 hover:bg-blue-700 transition">
+                            <i class="fas fa-plus mr-2"></i> Buat Pertanyaan
+                        </button>
                     </div>
-                    <p class="text-gray-400 text-sm">Platform belajar masa depan untuk generasi cerdas Indonesia.</p>
-                </div>
-                
-                <div>
-                    <h4 class="font-bold text-lg mb-4">Menu</h4>
-                    <ul class="space-y-2 text-gray-400 text-sm">
-                        <li><a href="#" class="hover:text-primary transition">Tentang Kami</a></li>
-                        <li><a href="#" class="hover:text-primary transition">Karir</a></li>
-                        <li><a href="#" class="hover:text-primary transition">Blog</a></li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h4 class="font-bold text-lg mb-4">Bantuan</h4>
-                    <ul class="space-y-2 text-gray-400 text-sm">
-                        <li><a href="#" class="hover:text-primary transition">FAQ</a></li>
-                        <li><a href="#" class="hover:text-primary transition">Hubungi Kami</a></li>
-                        <li><a href="#" class="hover:text-primary transition">Kebijakan Privasi</a></li>
-                    </ul>
                 </div>
 
-                <div>
-                    <h4 class="font-bold text-lg mb-4">Ikuti Kami</h4>
-                    <div class="flex space-x-4">
-                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition"><i class="fab fa-instagram"></i></a>
+                <!-- Main Discussion Feed -->
+                <div class="w-full lg:w-3/4 space-y-6">
+                    <!-- Info Alert -->
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle text-yellow-600"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-yellow-700">
+                                    <span class="font-bold">Info Guru:</span> Pak Budi (Fisika) sedang online. Silakan ajukan pertanyaan jika ada materi yang belum jelas.
+                                </p>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- Thread 1 (Ada Jawaban Guru) -->
+                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Andi" alt="Siswa">
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm">Andi Saputra <span class="text-xs font-normal text-gray-400">• 20 menit lalu</span></h4>
+                                    <span class="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold">Fisika - Bab 2</span>
+                                </div>
+                            </div>
+                            <span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded font-bold"><i class="fas fa-check-circle mr-1"></i>Dijawab Guru</span>
+                        </div>
+                        
+                        <h3 class="font-bold text-lg mb-2">Bingung tentang Hukum Newton II</h3>
+                        <p class="text-gray-600 text-sm mb-4">
+                            Pak/Bu, saya masih bingung kenapa percepatan berbanding terbalik dengan massa? Bisa tolong jelaskan dengan contoh sehari-hari? Terima kasih.
+                        </p>
+
+                        <!-- Jawaban Guru -->
+                        <div class="bg-blue-50 rounded-lg p-4 mt-4 border border-blue-100 ml-4 relative">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                </div>
+                                <span class="font-bold text-sm text-blue-800">Pak Budi (Guru Fisika)</span>
+                            </div>
+                            <p class="text-sm text-gray-700">
+                                Halo Andi. Coba bayangkan kamu mendorong sepeda motor vs mendorong truk mogok dengan tenaga yang sama. Pasti motor lebih cepat bergeraknya kan? Itu karena massa truk besar, jadi percepatannya kecil (lambat). Semakin besar massa benda, semakin "malas" dia bergerak.
+                            </p>
+                        </div>
+
+                        <div class="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100 text-gray-400 text-sm">
+                            <button class="hover:text-primary flex items-center gap-1"><i class="far fa-heart"></i> 5 Suka</button>
+                            <button class="hover:text-primary flex items-center gap-1"><i class="far fa-comment-dots"></i> Balas</button>
+                        </div>
+                    </div>
+
+                    <!-- Thread 2 (Belum Dijawab) -->
+                    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
+                                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Siti" alt="Siswa">
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm">Siti Aminah <span class="text-xs font-normal text-gray-400">• 5 menit lalu</span></h4>
+                                    <span class="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-bold">Matematika</span>
+                                </div>
+                            </div>
+                            <span class="bg-gray-100 text-gray-500 text-xs px-2 py-1 rounded font-bold"><i class="fas fa-clock mr-1"></i>Menunggu</span>
+                        </div>
+                        
+                        <h3 class="font-bold text-lg mb-2">Cara cepat menghitung akar pangkat 3?</h3>
+                        <p class="text-gray-600 text-sm mb-4">
+                            Teman-teman atau Bapak/Ibu guru, ada trik cepat gak ya buat ngerjain soal akar pangkat 3 ribuan? Besok mau ulangan harian nih.
+                        </p>
+
+                        <div class="flex items-center gap-4 mt-4 pt-4 border-t border-gray-100 text-gray-400 text-sm">
+                            <button class="hover:text-primary flex items-center gap-1"><i class="far fa-heart"></i> 12 Suka</button>
+                            <button class="hover:text-primary flex items-center gap-1"><i class="far fa-comment-dots"></i> 2 Balasan</button>
+                        </div>
+                    </div>
+
                 </div>
-            </div>
-            
-            <div class="border-t border-gray-800 pt-8 text-center text-gray-500 text-sm">
-                &copy; 2023 EduSmart Indonesia. All rights reserved.
             </div>
         </div>
-    </footer>
 
-    <!-- JavaScript for Interactivity -->
+        <!-- SECTION 3: KUIS -->
+        <div id="tab-kuis" class="tab-content hidden fade-in">
+            <div class="bg-white rounded-2xl p-8 border border-gray-200 text-center shadow-sm">
+                <div class="w-20 h-20 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-2">Kuis Harian SMP</h3>
+                <p class="text-gray-500 mb-6">Kumpulkan poin dengan menjawab soal-soal latihan.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+                    <button class="p-4 border border-gray-200 rounded-xl hover:border-primary hover:bg-blue-50 transition text-left group">
+                        <span class="block font-bold text-gray-800 group-hover:text-primary">Matematika Dasar</span>
+                        <span class="text-xs text-gray-400">10 Soal • 500 Poin</span>
+                    </button>
+                    <button class="p-4 border border-gray-200 rounded-xl hover:border-primary hover:bg-blue-50 transition text-left group">
+                        <span class="block font-bold text-gray-800 group-hover:text-primary">Pengetahuan Umum</span>
+                        <span class="text-xs text-gray-400">15 Soal • 750 Poin</span>
+                    </button>
+                    <button class="p-4 border border-gray-200 rounded-xl hover:border-primary hover:bg-blue-50 transition text-left group">
+                        <span class="block font-bold text-gray-800 group-hover:text-primary">Bahasa Inggris</span>
+                        <span class="text-xs text-gray-400">10 Soal • 500 Poin</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Buat Pertanyaan (Hidden by default) -->
+    <div id="question-modal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl w-full max-w-lg p-6 shadow-2xl animate-bounce-slow">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-bold text-xl">Ajukan Pertanyaan</h3>
+                <button onclick="document.getElementById('question-modal').classList.add('hidden')" class="text-gray-400 hover:text-red-500">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form onsubmit="event.preventDefault(); alert('Pertanyaan berhasil dikirim! Guru akan segera menjawab.'); document.getElementById('question-modal').classList.add('hidden');">
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Mata Pelajaran</label>
+                    <select class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-primary focus:outline-none">
+                        <option>Matematika</option>
+                        <option>IPA</option>
+                        <option>Bahasa Inggris</option>
+                        <option>Lainnya</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Judul Pertanyaan</label>
+                    <input type="text" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-primary focus:outline-none" placeholder="Contoh: Rumus Phytagoras">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-bold text-gray-700 mb-1">Isi Pertanyaan</label>
+                    <textarea class="w-full border border-gray-300 rounded-lg p-2.5 h-32 focus:ring-2 focus:ring-primary focus:outline-none" placeholder="Jelaskan detail pertanyaanmu disini..."></textarea>
+                </div>
+                <button type="submit" class="w-full bg-primary text-white font-bold py-3 rounded-xl hover:bg-blue-700 transition">Kirim Pertanyaan</button>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // Toggle Mobile Menu
-        function toggleMenu() {
-            const menu = document.getElementById('mobileMenu');
-            menu.classList.toggle('hidden');
-        }
-
-        // Smooth Scroll
-        function scrollToSection(id) {
-            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // --- Simple Quiz Logic ---
-        const questions = [
-            {
-                question: "Planet apa yang paling dekat dengan Matahari?",
-                options: ["Venus", "Bumi", "Merkurius", "Mars"],
-                correct: 2 // Index of correct answer
+        // Data Dummy untuk simulasi perubahan konten
+        const contentData = {
+            'SD': {
+                color: 'red',
+                title: 'Dunia Belajar Ceria SD',
+                desc: 'Belajar sambil bermain dengan video animasi lucu dan kuis warna-warni.',
+                materi: 'Matematika Dasar, Membaca, Mengenal Hewan',
+                quizTitle: 'Kuis Petualangan SD'
             },
-            {
-                question: "Berapa hasil dari 7 x 8?",
-                options: ["54", "56", "64", "48"],
-                correct: 1
+            'SMP': {
+                color: 'blue',
+                title: 'Ruang Belajar Interaktif SMP',
+                desc: 'Akses materi, kerjakan kuis, dan tanyakan hal yang sulit dimengerti kepada guru melalui forum diskusi.',
+                materi: 'Aljabar, Fisika Dasar, Biologi Sel',
+                quizTitle: 'Kuis Harian SMP'
             },
-            {
-                question: "Ibu kota negara Indonesia yang baru berada di pulau?",
-                options: ["Jawa", "Sumatera", "Kalimantan", "Sulawesi"],
-                correct: 2
+            'SMA': {
+                color: 'gray',
+                title: 'Persiapan Ujian & Materi SMA',
+                desc: 'Diskusi mendalam untuk persiapan UTBK, materi kompleks, dan bimbingan karir.',
+                materi: 'Kalkulus, Kimia Organik, Sosiologi',
+                quizTitle: 'Tryout & Latihan Soal SMA'
             }
-        ];
+        };
 
-        let currentQuestion = 0;
-        let score = 0;
+        let currentLevel = 'SMP'; // Default
 
-        function loadQuestion() {
-            const q = questions[currentQuestion];
-            document.getElementById('q-number').innerText = currentQuestion + 1;
-            document.getElementById('q-text').innerText = q.question;
+        function switchLevel(level) {
+            currentLevel = level;
+            const data = contentData[level];
+            const header = document.getElementById('level-header');
+
+            // Reset Button Styles
+            document.querySelectorAll('.level-btn').forEach(btn => {
+                btn.className = `level-btn px-6 py-2 rounded-full border-2 border-gray-100 bg-gray-50 text-gray-600 font-bold hover:bg-gray-200 transition flex items-center gap-2`;
+            });
+
+            // Set Active Button Style
+            const activeBtn = document.getElementById(`btn-${level.toLowerCase()}`);
+            let colorClass = level === 'SD' ? 'bg-red-600 border-red-500 shadow-red-200' : 
+                             level === 'SMP' ? 'bg-blue-600 border-blue-500 shadow-blue-200' : 
+                             'bg-gray-700 border-gray-600 shadow-gray-400';
             
-            const optionsHtml = q.options.map((opt, index) => 
-                `<button onclick="checkAnswer(${index}, this)" class="option-btn w-full text-left p-3 rounded-xl border-2 border-gray-200 hover:border-primary hover:bg-indigo-50 transition font-medium text-gray-700">
-                    ${opt}
-                </button>`
-            ).join('');
+            activeBtn.className = `level-btn px-6 py-2 rounded-full border-2 text-white font-bold shadow-lg transition flex items-center gap-2 ${colorClass}`;
+
+            // Update Header Content with Animation
+            header.innerHTML = `
+                <div class="bg-gradient-to-r from-${data.color}-600 to-${data.color}-500 rounded-2xl p-8 text-white relative overflow-hidden">
+                    <div class="relative z-10">
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-bold mb-2 inline-block">Mode Siswa ${level}</span>
+                        <h1 class="text-3xl font-bold font-display mb-2">${data.title}</h1>
+                        <p class="opacity-90 max-w-xl">${data.desc}</p>
+                    </div>
+                    <i class="fas fa-book-open absolute right-4 bottom-[-20px] text-9xl opacity-10 rotate-12"></i>
+                </div>
+            `;
             
-            document.getElementById('options-container').innerHTML = optionsHtml;
-            document.getElementById('feedback').classList.add('hidden');
-            document.getElementById('next-btn').classList.add('hidden');
+            // Re-trigger animation
+            header.classList.remove('fade-in');
+            void header.offsetWidth; // trigger reflow
+            header.classList.add('fade-in');
+
+            // Update Quiz Title
+            document.querySelector('#tab-kuis h3').innerText = data.quizTitle;
         }
 
-        function checkAnswer(selectedIndex, btnElement) {
-            // Disable all buttons
-            const buttons = document.querySelectorAll('.option-btn');
-            buttons.forEach(btn => btn.disabled = true);
-
-            const correctIndex = questions[currentQuestion].correct;
-            const feedbackEl = document.getElementById('feedback');
+        function switchTab(tabName) {
+            // Hide all contents
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             
-            feedbackEl.classList.remove('hidden');
+            // Show selected content
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
 
-            if (selectedIndex === correctIndex) {
-                btnElement.classList.add('bg-green-100', 'border-green-500', 'text-green-700');
-                feedbackEl.innerText = "🎉 Benar! Bagus sekali.";
-                feedbackEl.className = "mt-4 p-3 rounded-lg text-center font-bold text-sm bg-green-100 text-green-700";
-                score++;
-            } else {
-                btnElement.classList.add('bg-red-100', 'border-red-500', 'text-red-700');
-                // Highlight correct answer
-                buttons[correctIndex].classList.add('bg-green-100', 'border-green-500', 'text-green-700');
-                feedbackEl.innerText = "😅 Ups! Jawaban kurang tepat.";
-                feedbackEl.className = "mt-4 p-3 rounded-lg text-center font-bold text-sm bg-red-100 text-red-700";
-            }
-
-            document.getElementById('next-btn').classList.remove('hidden');
+            // Update tab styles
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.className = 'tab-btn border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium pb-3 px-2 whitespace-nowrap relative';
+            });
+            
+            // Set active tab style
+            const activeTabBtn = event.currentTarget; // Get the clicked button
+            activeTabBtn.className = 'tab-btn active border-b-2 border-primary text-primary font-bold pb-3 px-2 whitespace-nowrap relative';
         }
 
-        function nextQuestion() {
-            currentQuestion++;
-            if (currentQuestion < questions.length) {
-                loadQuestion();
-            } else {
-                showResult();
-            }
-        }
-
-        function showResult() {
-            document.getElementById('quiz-container').classList.add('hidden');
-            document.getElementById('quiz-result').classList.remove('hidden');
-            document.getElementById('final-score').innerText = `${score} / ${questions.length}`;
-        }
-
-        function restartQuiz() {
-            currentQuestion = 0;
-            score = 0;
-            document.getElementById('quiz-result').classList.add('hidden');
-            document.getElementById('quiz-container').classList.remove('hidden');
-            loadQuestion();
-        }
-
-        // Load first question on start
-        loadQuestion();
+        // Initialize default state
+        switchLevel('SMP');
     </script>
 </body>
 </html>
